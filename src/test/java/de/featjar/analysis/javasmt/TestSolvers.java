@@ -26,6 +26,8 @@ import static org.junit.jupiter.api.Assertions.fail;
 import de.featjar.Common;
 import de.featjar.base.FeatJAR;
 import de.featjar.base.env.HostEnvironment;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.sosy_lab.common.ShutdownNotifier;
 import org.sosy_lab.common.configuration.Configuration;
@@ -36,6 +38,16 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.SolverContext;
 
 public class TestSolvers extends Common { // TODO
+
+    @BeforeAll
+    public static void begin() {
+        FeatJAR.testConfiguration().initialize();
+    }
+
+    @AfterAll
+    public static void end() {
+        FeatJAR.deinitialize();
+    }
 
     private void solversWindows() {
         testAvailability(Solvers.MATHSAT5);
