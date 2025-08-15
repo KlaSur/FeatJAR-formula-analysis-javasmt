@@ -22,12 +22,11 @@ package de.featjar.analysis.javasmt.cli;
 
 import de.featjar.analysis.javasmt.computation.ComputeSolutionCount;
 import de.featjar.base.computation.IComputation;
-import de.featjar.formula.assignment.BooleanAssignment;
 import de.featjar.formula.structure.IFormula;
 import java.math.BigInteger;
 import java.util.Optional;
 
-public class CountCommand extends AJavasmtAnalysisCommand<BigInteger, BooleanAssignment> {
+public class CountCommand extends AJavasmtAnalysisCommand<BigInteger> {
 
     @Override
     public Optional<String> getDescription() {
@@ -37,11 +36,6 @@ public class CountCommand extends AJavasmtAnalysisCommand<BigInteger, BooleanAss
     @Override
     public IComputation<BigInteger> newAnalysis(IComputation<IFormula> formula) {
         return formula.map(ComputeSolutionCount::new);
-    }
-
-    @Override
-    public String printResult(BigInteger count) {
-        return count.toString();
     }
 
     @Override

@@ -21,13 +21,15 @@
 package de.featjar.analysis.javasmt.cli;
 
 import de.featjar.analysis.javasmt.computation.ComputeSolution;
+import de.featjar.base.cli.OptionList;
 import de.featjar.base.computation.IComputation;
-import de.featjar.formula.assignment.BooleanAssignment;
+import de.featjar.base.io.format.IFormat;
 import de.featjar.formula.assignment.ValueAssignment;
+import de.featjar.formula.io.textual.ValueAssignmentFormat;
 import de.featjar.formula.structure.IFormula;
 import java.util.Optional;
 
-public class SolutionCommand extends AJavasmtAnalysisCommand<ValueAssignment, BooleanAssignment> {
+public class SolutionCommand extends AJavasmtAnalysisCommand<ValueAssignment> {
 
     @Override
     public Optional<String> getDescription() {
@@ -40,8 +42,8 @@ public class SolutionCommand extends AJavasmtAnalysisCommand<ValueAssignment, Bo
     }
 
     @Override
-    public String printResult(ValueAssignment assignment) {
-        return assignment.print();
+    protected IFormat<ValueAssignment> getOuputFormat(OptionList optionParser) {
+        return new ValueAssignmentFormat();
     }
 
     @Override

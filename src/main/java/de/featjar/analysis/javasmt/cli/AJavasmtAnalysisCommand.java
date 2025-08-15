@@ -31,7 +31,7 @@ import de.featjar.formula.computation.ComputeNNFFormula;
 import de.featjar.formula.io.FormulaFormats;
 import de.featjar.formula.structure.IFormula;
 
-public abstract class AJavasmtAnalysisCommand<T, U> extends AAnalysisCommand<T> {
+public abstract class AJavasmtAnalysisCommand<T> extends AAnalysisCommand<T> {
 
     /**
      * Option for setting the seed for the pseudo random generator.
