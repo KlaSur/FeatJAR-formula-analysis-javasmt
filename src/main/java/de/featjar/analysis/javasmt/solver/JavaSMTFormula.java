@@ -20,6 +20,7 @@
  */
 package de.featjar.analysis.javasmt.solver;
 
+import de.featjar.formula.VariableMap;
 import de.featjar.formula.structure.IExpression;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -35,8 +36,12 @@ public class JavaSMTFormula {
 
     private final BooleanFormula formula;
     private final FormulaToJavaSMT translator;
+    private VariableMap variableMap;
+    private SolverContext solverContext;
 
-    public JavaSMTFormula(SolverContext solverContext, IExpression expression) {
+    public JavaSMTFormula(SolverContext solverContext, IExpression expression, VariableMap variableMap) {
+    	this.solverContext = solverContext;
+    	this.variableMap = variableMap;
         translator = new FormulaToJavaSMT(solverContext);
         formula = translator.nodeToFormula(expression);
     }
@@ -48,7 +53,15 @@ public class JavaSMTFormula {
     public BooleanFormula getFormula() {
         return formula;
     }
-
+    
+    public VariableMap getVariableMap() {
+        return variableMap;
+    }
+    
+    public SolverContext getContext() {
+        return solverContext;
+    }
+    
     public List<BooleanFormula> getBooleanVariables() {
         return translator.getVariableFormulas().stream()
                 .filter(f -> f instanceof BooleanFormula)

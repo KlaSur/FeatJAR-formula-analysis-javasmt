@@ -20,7 +20,9 @@
  */
 package de.featjar.analysis.javasmt.computation;
 
+import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
 import de.featjar.analysis.javasmt.solver.JavaSMTSolver;
+import de.featjar.base.computation.Computations;
 import de.featjar.base.computation.Dependency;
 import de.featjar.base.computation.IComputation;
 import de.featjar.base.computation.Progress;
@@ -48,8 +50,8 @@ public class ComputeVariableRange extends AJavaSMTAnalysis<Object[]> {
 
     public static final Dependency<String> VARIABLE = Dependency.newDependency(String.class);
 
-    public ComputeVariableRange(IComputation<? extends IExpression> formula) {
-        super(formula);
+    public ComputeVariableRange(IComputation<? extends JavaSMTFormula> formula) {
+        super(formula, Computations.of(""));
     }
 
     protected ComputeVariableRange(AJavaSMTAnalysis<Object[]> other) {

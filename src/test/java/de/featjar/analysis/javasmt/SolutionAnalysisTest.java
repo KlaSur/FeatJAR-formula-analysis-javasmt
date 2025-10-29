@@ -22,14 +22,20 @@ package de.featjar.analysis.javasmt;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.booleanThat;
 
 import de.featjar.Common;
 import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
+import de.featjar.analysis.javasmt.computation.ComputeSatisfiability;
+import de.featjar.analysis.javasmt.computation.ComputeSolution;
 import de.featjar.analysis.javasmt.computation.ComputeSolutionCount;
+import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
 import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.Computations;
 import de.featjar.base.data.Problem;
 import de.featjar.base.data.Result;
+import de.featjar.formula.VariableMap;
+import de.featjar.formula.assignment.ValueAssignment;
 import de.featjar.formula.structure.Expressions;
 import de.featjar.formula.structure.IFormula;
 import de.featjar.formula.structure.connective.And;
@@ -38,11 +44,16 @@ import de.featjar.formula.structure.connective.Implies;
 import de.featjar.formula.structure.connective.Or;
 import de.featjar.formula.structure.predicate.Literal;
 import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class CountSolutionsAnalysisTest extends Common {
+public class SolutionAnalysisTest {
 
     @BeforeAll
     public static void begin() {
@@ -55,7 +66,7 @@ public class CountSolutionsAnalysisTest extends Common {
     }
 
     @Test
-    public void formulaHas3Solutions() {
+    public void formulaHasSatisfyingAssignment() {
         final Literal a = Expressions.literal("a");
         final Literal b = Expressions.literal("b");
         final Literal c = Expressions.literal("c");
@@ -66,22 +77,26 @@ public class CountSolutionsAnalysisTest extends Common {
         final And and = new And(equals, c);
         final Implies formula = new Implies(or, and);
 
-        checkCount(formula, 3);
-    }
-
-    @Test
-    public void gplHas960Solutions() {
-        IFormula formula = loadFormula("testFeatureModels/gpl_medium_model.xml");
-        checkCount(formula, 960);
-    }
-
-    private void checkCount(final IFormula formula, int count) {
         IFormula cnf = formula.toCNF().orElseThrow();
-        final Result<BigInteger> result =
+        
+        // retrieve variableMap from first computation using ComputeJavaSMTFormula
+        final Result<JavaSMTFormula> javaSMTFormulaResult =
                 Computations.of(cnf)
                 .map(ComputeJavaSMTFormula::new)
-                .map(ComputeSolutionCount::new).computeResult();
-        assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
-        assertEquals(BigInteger.valueOf(count), result.get());
+                .computeResult();
+        assertTrue(javaSMTFormulaResult.isPresent(), () -> Problem.printProblems(javaSMTFormulaResult.getProblems()));
+        JavaSMTFormula javaSMTFormula = javaSMTFormulaResult.get();
+        VariableMap variableMap = javaSMTFormula.getVariableMap();
+        
+        // get a satisfying assignment 
+        final Result<ValueAssignment> valueAssignmentResult = 
+        		Computations.of(javaSMTFormula).map(ComputeSolution::new).computeResult();
+        assertTrue(valueAssignmentResult.isPresent(), () -> Problem.printProblems(valueAssignmentResult.getProblems()));
+        ValueAssignment valueAssignment = valueAssignmentResult.get();
+        
+        // use variableMap for evaluation of formula with the assignment
+        boolean satisfiesFormula = (Boolean) formula.evaluate(valueAssignment, variableMap).orElseThrow();
+        
+        assertEquals(true, satisfiesFormula);
     }
 }

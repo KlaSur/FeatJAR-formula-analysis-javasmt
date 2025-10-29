@@ -20,6 +20,7 @@
  */
 package de.featjar.analysis.javasmt.computation;
 
+import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
 import de.featjar.analysis.javasmt.solver.JavaSMTSolver;
 import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.AComputation;
@@ -39,9 +40,9 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
  */
 public abstract class AJavaSMTAnalysis<T> extends AComputation<T> {
 
-    public static final Dependency<IExpression> FORMULA = Dependency.newDependency(IExpression.class);
+    public static final Dependency<JavaSMTFormula> FORMULA = Dependency.newDependency(JavaSMTFormula.class);
 
-    public AJavaSMTAnalysis(IComputation<? extends IExpression> formula, Object... computations) {
+    public AJavaSMTAnalysis(IComputation<? extends JavaSMTFormula> formula, Object... computations) {
         super(formula, computations);
     }
 
@@ -49,12 +50,12 @@ public abstract class AJavaSMTAnalysis<T> extends AComputation<T> {
         super(other);
     }
 
-    protected JavaSMTSolver newSolver(IExpression formula) {
+    protected JavaSMTSolver newSolver(JavaSMTFormula formula) {
         return new JavaSMTSolver(formula, Solvers.SMTINTERPOL);
     }
 
     public JavaSMTSolver initializeSolver(List<Object> dependencyList, boolean empty) {
-        IExpression formula = FORMULA.get(dependencyList);
+        JavaSMTFormula formula = FORMULA.get(dependencyList);
         FeatJAR.log().debug("initializing JavaSmt");
         FeatJAR.log().debug(formula);
         return newSolver(formula);

@@ -25,6 +25,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import de.featjar.Common;
 import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
+import de.featjar.analysis.javasmt.computation.ComputeSatisfiability;
 import de.featjar.analysis.javasmt.computation.ComputeSolutionCount;
 import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.Computations;
@@ -42,7 +43,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
-public class CountSolutionsAnalysisTest extends Common {
+public class SatisfiabilityAnalysisTest {
 
     @BeforeAll
     public static void begin() {
@@ -55,7 +56,7 @@ public class CountSolutionsAnalysisTest extends Common {
     }
 
     @Test
-    public void formulaHas3Solutions() {
+    public void formulaIsSatisfiable() {
         final Literal a = Expressions.literal("a");
         final Literal b = Expressions.literal("b");
         final Literal c = Expressions.literal("c");
@@ -65,23 +66,12 @@ public class CountSolutionsAnalysisTest extends Common {
         final BiImplies equals = new BiImplies(a, b);
         final And and = new And(equals, c);
         final Implies formula = new Implies(or, and);
-
-        checkCount(formula, 3);
-    }
-
-    @Test
-    public void gplHas960Solutions() {
-        IFormula formula = loadFormula("testFeatureModels/gpl_medium_model.xml");
-        checkCount(formula, 960);
-    }
-
-    private void checkCount(final IFormula formula, int count) {
+        
         IFormula cnf = formula.toCNF().orElseThrow();
-        final Result<BigInteger> result =
-                Computations.of(cnf)
-                .map(ComputeJavaSMTFormula::new)
-                .map(ComputeSolutionCount::new).computeResult();
+        final Result<Boolean> result = Computations.of(cnf)
+        		.map(ComputeJavaSMTFormula::new)
+        		.map(ComputeSatisfiability::new).computeResult();
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
-        assertEquals(BigInteger.valueOf(count), result.get());
-    }
+        assertEquals(true, result.get());
+   }
 }

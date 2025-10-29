@@ -22,6 +22,7 @@ package de.featjar.analysis.javasmt.solver;
 
 import de.featjar.base.FeatJAR;
 import de.featjar.base.data.Result;
+import de.featjar.formula.VariableMap;
 import de.featjar.formula.structure.IExpression;
 import java.math.BigInteger;
 import java.util.Collections;
@@ -47,6 +48,9 @@ import org.sosy_lab.java_smt.api.OptimizationProverEnvironment.OptStatus;
 import org.sosy_lab.java_smt.api.ProverEnvironment;
 import org.sosy_lab.java_smt.api.SolverContext;
 import org.sosy_lab.java_smt.api.SolverContext.ProverOptions;
+
+import ap.parser.Environment.Variable;
+
 import org.sosy_lab.java_smt.api.SolverException;
 
 /**
@@ -73,6 +77,9 @@ public class JavaSMTSolver {
     }
 
     private JavaSMTFormula formula;
+    
+
+    private VariableMap variableMap;
 
     /**
      * The current context of the solver. Used by the translator to translate prop4J
@@ -80,14 +87,17 @@ public class JavaSMTSolver {
      */
     public SolverContext context;
 
-    public JavaSMTSolver(IExpression expression, Solvers solver) {
+    public JavaSMTSolver(JavaSMTFormula javaSMTFormula, Solvers solver) {
         try {
             final Configuration config = Configuration.defaultConfiguration();
             final LogManager logManager = BasicLogManager.create(config);
             final ShutdownManager shutdownManager = ShutdownManager.create();
-            context =
-                    SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
-            this.formula = new JavaSMTFormula(context, expression);
+            //context =
+            //        SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
+            //this.formula = new JavaSMTFormula(context, expression);
+            this.formula = javaSMTFormula;
+            context = formula.getContext();
+            variableMap = javaSMTFormula.getVariableMap();
         } catch (final InvalidConfigurationException e) {
             FeatJAR.log().error(e);
         }
@@ -103,12 +113,13 @@ public class JavaSMTSolver {
     }
 
     public de.featjar.formula.assignment.ValueAssignment getSolution() {
-        try (ProverEnvironment prover = context.newProverEnvironment()) {
+        try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
             prover.addConstraint(formula.getFormula());
             if (!prover.isUnsat()) {
-                final LinkedHashMap<String, Object> solution = new LinkedHashMap<>();
+                final LinkedHashMap<Integer, Object> solution = new LinkedHashMap<>();
+            	
                 for (ValueAssignment assignment : prover.getModel()) {
-                    solution.put(assignment.getName(), assignment.getValue());
+                    solution.put(variableMap.get(assignment.getName()).orElseThrow(), assignment.getValue());
                 }
                 return new de.featjar.formula.assignment.ValueAssignment(solution);
             } else {
