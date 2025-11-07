@@ -41,6 +41,8 @@ import de.featjar.formula.structure.term.function.AMultiply;
 import de.featjar.formula.structure.term.function.IFunction;
 import de.featjar.formula.structure.term.value.Constant;
 import de.featjar.formula.structure.term.value.Variable;
+
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,10 +77,28 @@ public class FormulaToJavaSMT {
 
     private final Map<String, VariableReference> variableMap = new LinkedHashMap<>();
 
-    private static class VariableReference {
+    public static class VariableReference {
         private int index;
         private Variable variable;
         private Formula javaSmtVariable;
+		public int getIndex() {
+			return index;
+		}
+		public void setIndex(int index) {
+			this.index = index;
+		}
+		public Variable getVariable() {
+			return variable;
+		}
+		public void setVariable(Variable variable) {
+			this.variable = variable;
+		}
+		public Formula getJavaSmtVariable() {
+			return javaSmtVariable;
+		}
+		public void setJavaSmtVariable(Formula javaSmtVariable) {
+			this.javaSmtVariable = javaSmtVariable;
+		}
     }
 
     public FormulaToJavaSMT(SolverContext context) {
@@ -95,6 +115,10 @@ public class FormulaToJavaSMT {
         } else {
             isPrincess = true;
         }
+    }
+    
+    public List<VariableReference> getMappings() {
+        return new ArrayList<>(variableMap.values());
     }
 
     public BooleanFormula nodeToFormula(IExpression expression) {

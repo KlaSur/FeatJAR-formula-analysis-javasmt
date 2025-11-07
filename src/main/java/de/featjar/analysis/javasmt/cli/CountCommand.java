@@ -20,6 +20,7 @@
  */
 package de.featjar.analysis.javasmt.cli;
 
+import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
 import de.featjar.analysis.javasmt.computation.ComputeSolutionCount;
 import de.featjar.base.computation.IComputation;
 import de.featjar.formula.structure.IFormula;
@@ -35,7 +36,8 @@ public class CountCommand extends AJavasmtAnalysisCommand<BigInteger> {
 
     @Override
     public IComputation<BigInteger> newAnalysis(IComputation<IFormula> formula) {
-        return formula.map(ComputeSolutionCount::new);
+        return formula.map(ComputeJavaSMTFormula::new)
+        .map(ComputeSolutionCount::new);
     }
 
     @Override

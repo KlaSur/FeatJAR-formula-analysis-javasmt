@@ -24,7 +24,10 @@ import de.featjar.formula.VariableMap;
 import de.featjar.formula.structure.IExpression;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
+import org.sosy_lab.java_smt.api.NumeralFormula;
 import org.sosy_lab.java_smt.api.SolverContext;
 
 /**
@@ -38,12 +41,14 @@ public class JavaSMTFormula {
     private final FormulaToJavaSMT translator;
     private VariableMap variableMap;
     private SolverContext solverContext;
+    private Solvers solverName;
 
-    public JavaSMTFormula(SolverContext solverContext, IExpression expression, VariableMap variableMap) {
+    public JavaSMTFormula(SolverContext solverContext, IExpression expression, VariableMap variableMap, Solvers solverName) {
     	this.solverContext = solverContext;
     	this.variableMap = variableMap;
         translator = new FormulaToJavaSMT(solverContext);
         formula = translator.nodeToFormula(expression);
+        this.solverName = solverName;
     }
 
     public FormulaToJavaSMT getTranslator() {
@@ -62,10 +67,21 @@ public class JavaSMTFormula {
         return solverContext;
     }
     
+    public Solvers getSolverName() {
+    	return solverName;
+    }
+    
     public List<BooleanFormula> getBooleanVariables() {
         return translator.getVariableFormulas().stream()
                 .filter(f -> f instanceof BooleanFormula)
                 .map(f -> (BooleanFormula) f)
+                .collect(Collectors.toList());
+    }
+    
+    public List<NumeralFormula> getNumeralVariables() {
+        return translator.getVariableFormulas().stream()
+                .filter(f -> f instanceof NumeralFormula)
+                .map(f -> (NumeralFormula) f)
                 .collect(Collectors.toList());
     }
 }

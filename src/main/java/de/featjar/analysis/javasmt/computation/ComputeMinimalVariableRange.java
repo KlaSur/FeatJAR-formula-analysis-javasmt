@@ -20,6 +20,7 @@
  */
 package de.featjar.analysis.javasmt.computation;
 
+import de.featjar.analysis.javasmt.solver.FormulaToJavaSMT.VariableReference;
 import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
 import de.featjar.analysis.javasmt.solver.JavaSMTSolver;
 import de.featjar.base.computation.Computations;
@@ -28,8 +29,16 @@ import de.featjar.base.computation.IComputation;
 import de.featjar.base.computation.Progress;
 import de.featjar.base.data.Result;
 import de.featjar.formula.structure.IExpression;
+import de.featjar.formula.structure.term.value.Variable;
+
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.Formula;
+import org.sosy_lab.java_smt.api.NumeralFormula;
 
 /**
  * Finds the minimum and maximum value of a Term. As example we have the
@@ -46,29 +55,32 @@ import org.sosy_lab.java_smt.api.Formula;
  * @author Joshua Sprey
  * @author Sebastian Krieter
  */
-public class ComputeVariableRange extends AJavaSMTAnalysis<Object[]> {
+public class ComputeMinimalVariableRange extends AJavaSMTAnalysis<Map<Variable, Object>> {
 
-    public static final Dependency<String> VARIABLE = Dependency.newDependency(String.class);
-
-    public ComputeVariableRange(IComputation<? extends JavaSMTFormula> formula) {
-        super(formula, Computations.of(""));
+    public ComputeMinimalVariableRange(IComputation<? extends JavaSMTFormula> formula) {
+        super(formula);
     }
 
-    protected ComputeVariableRange(AJavaSMTAnalysis<Object[]> other) {
+    protected ComputeMinimalVariableRange(AJavaSMTAnalysis<Map<Variable, Object>> other) {
         super(other);
     }
 
     @Override
-    public Result<Object[]> compute(List<Object> dependencyList, Progress progress) {
+    public Result<Map<Variable, Object>> compute(List<Object> dependencyList, Progress progress) {
         JavaSMTSolver solver = initializeSolver(dependencyList);
-        String variableName = VARIABLE.get(dependencyList);
-        final Object[] result = new Object[2];
-        Formula variable = solver.getSolverFormula()
-                .getTranslator()
-                .getVariableFormula(variableName)
-                .orElseThrow();
-        result[0] = solver.minimize(variable);
-        result[1] = solver.maximize(variable);
-        return Result.ofNullable(result);
+        Solvers solverName = solver.getSolverFormula().getSolverName();
+        if (!(solverName.equals(Solvers.Z3))) {
+        	return Result.empty(new UnsupportedOperationException(solverName + " does not support Variable Ranges."));
+        }
+        
+        List<VariableReference> variablesToJavaSMT = solver.getSolverFormula().getTranslator().getMappings();
+        Map<Variable, Object> variabelsToMinimalRanges = new HashMap<Variable, Object>();
+        for (VariableReference variableToJavaSMT : variablesToJavaSMT) {
+        	Formula variableToMinimize = variableToJavaSMT.getJavaSmtVariable();
+        	Object minimalRange = solver.minimize(variableToJavaSMT.getJavaSmtVariable());
+            variabelsToMinimalRanges.put(variableToJavaSMT.getVariable(), minimalRange);
+        }
+        
+        return Result.ofNullable(variabelsToMinimalRanges);
     }
 }

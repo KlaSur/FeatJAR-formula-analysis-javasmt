@@ -34,6 +34,7 @@ import org.sosy_lab.java_smt.api.SolverContext;
 import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
 import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.AComputation;
+import de.featjar.base.computation.Computations;
 import de.featjar.base.computation.Dependency;
 import de.featjar.base.computation.IComputation;
 import de.featjar.base.computation.Progress;
@@ -50,9 +51,10 @@ import de.featjar.formula.structure.IFormula;
  */
 public class ComputeJavaSMTFormula extends AComputation<JavaSMTFormula> {
 	public static final Dependency<IFormula> FORMULA = Dependency.newDependency(IFormula.class);
+	public static final Dependency<Solvers> SOLVER = Dependency.newDependency(Solvers.class);
 
 	    public ComputeJavaSMTFormula(IComputation<? extends IFormula> formula) {
-	        super(formula);
+	        super(formula, Computations.of(""));
 	    }
 
 	    protected ComputeJavaSMTFormula(ComputeBooleanClauseList other) {
@@ -62,6 +64,33 @@ public class ComputeJavaSMTFormula extends AComputation<JavaSMTFormula> {
 	    @Override
 	    public Result<JavaSMTFormula> compute(List<Object> dependencyList, Progress progress) {
 	        IFormula vp = (IFormula) FORMULA.get(dependencyList);
+	        Solvers solver = SOLVER.get(dependencyList);
+	        
+//	        Solvers solver = null;
+//	        switch (solverType) {
+//	        	case "MATHSAT5":
+//	        		solver = Solvers.MATHSAT5;
+//	        		break;
+//	        	case "SMTINTERPOL":
+//	        		solver = Solvers.SMTINTERPOL;
+//	        		break;
+//	        	case "Z3":
+//	        		solver = Solvers.Z3;
+//	        		break;
+//	        	case "PRINCESS":
+//	        		solver = Solvers.PRINCESS;
+//	        		break;
+//	        	case "BOOLECTOR":
+//	        		solver = Solvers.BOOLECTOR;
+//	        		break;
+//	        	case "CVC4":
+//	        		solver = Solvers.CVC4;
+//	        		break;
+//	        	case "YICES2":
+//	        		solver = Solvers.YICES2;
+//	        		break;
+//	        }
+	        
 	        VariableMap variableMap = new VariableMap(vp);
 	        
 	        JavaSMTFormula formula = null;
@@ -69,11 +98,13 @@ public class ComputeJavaSMTFormula extends AComputation<JavaSMTFormula> {
 	        
 	        try {
 	            final Configuration config = Configuration.defaultConfiguration();
+	           
 	            final LogManager logManager = BasicLogManager.create(config);
 	            final ShutdownManager shutdownManager = ShutdownManager.create();
 	            context =
-	                    SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), Solvers.MATHSAT5);
-	            formula = new JavaSMTFormula(context, vp, variableMap);
+	                    SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
+	           
+	            formula = new JavaSMTFormula(context, vp, variableMap, solver);
 	           
 	      
 	        } catch (final InvalidConfigurationException e) {

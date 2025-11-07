@@ -41,6 +41,7 @@ import java.math.BigInteger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 public class CountSolutionsAnalysisTest extends Common {
 
@@ -75,11 +76,19 @@ public class CountSolutionsAnalysisTest extends Common {
         checkCount(formula, 960);
     }
 
+    @Test
+    public void carHas7Solutions() {
+        IFormula formula = loadFormula("testFeatureModels/car.xml");
+        checkCount(formula, 7);
+    }
+
+
     private void checkCount(final IFormula formula, int count) {
         IFormula cnf = formula.toCNF().orElseThrow();
         final Result<BigInteger> result =
                 Computations.of(cnf)
                 .map(ComputeJavaSMTFormula::new)
+                .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
                 .map(ComputeSolutionCount::new).computeResult();
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
         assertEquals(BigInteger.valueOf(count), result.get());

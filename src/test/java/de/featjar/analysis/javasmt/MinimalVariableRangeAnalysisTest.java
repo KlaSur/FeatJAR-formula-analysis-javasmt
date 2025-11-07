@@ -20,56 +20,74 @@
  */
 package de.featjar.analysis.javasmt;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.checkerframework.common.reflection.qual.NewInstance;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
-import de.featjar.analysis.javasmt.computation.ComputeVariableRange;
+import de.featjar.analysis.javasmt.computation.ComputeMinimalVariableRange;
 import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.Computations;
 import de.featjar.base.data.Problem;
 import de.featjar.base.data.Result;
+import de.featjar.formula.structure.Expressions;
 import de.featjar.formula.structure.connective.And;
+import de.featjar.formula.structure.connective.BiImplies;
+import de.featjar.formula.structure.connective.Implies;
+import de.featjar.formula.structure.connective.Or;
 import de.featjar.formula.structure.predicate.GreaterThan;
 import de.featjar.formula.structure.predicate.LessThan;
+import de.featjar.formula.structure.predicate.Literal;
 import de.featjar.formula.structure.term.value.Constant;
 import de.featjar.formula.structure.term.value.Variable;
 
-public class VariableRangeAnalysisTest {
+public class MinimalVariableRangeAnalysisTest {
 
     @BeforeAll
     public static void begin() {
         FeatJAR.testConfiguration().initialize();
     }
-
+    
     @AfterAll
     public static void end() {
         FeatJAR.deinitialize();
     }
 
     @Test
-    public void formulaHasRangeVariableFrom0To2() {
+    public void formulaHasTwoVariablesWithMinimalRange4And8() {
         final Variable a = new Variable("a", Long.class);
+        final Variable b = new Variable("b", Long.class);
         final Constant constant3 = new Constant(3L);
         final Constant constant7 = new Constant(7L);
         
-        final GreaterThan greaterThan = new GreaterThan(a, constant3);
-        final LessThan lessThan = new LessThan(a, constant7);
-        final And formula = new And(greaterThan, lessThan);
+        final GreaterThan greaterThanA = new GreaterThan(a, constant3);
+        final GreaterThan greaterThanB = new GreaterThan(b, constant7);
+        final And formula = new And(greaterThanA, greaterThanB);
         
+//      Map<Variable, Object> solutionMinimalRanges = new HashMap<Variable, Object>();
+//      solutionMinimalRanges.put(a, new Rational(4));
+//      solutionMinimalRanges.put(b, 8);
+//        
         // IFormula cnf = formula.toCNF().orElseThrow();
-        final Result<Object[]> result = Computations.of(formula)
+        final Result<Map<Variable, Object>> result = Computations.of(formula)
         		.map(ComputeJavaSMTFormula::new)
-        		.map(ComputeVariableRange::new)
-        		.set(ComputeVariableRange.VARIABLE, "a")
+        		.set(ComputeJavaSMTFormula.SOLVER, Solvers.SMTINTERPOL)
+        		.map(ComputeMinimalVariableRange::new)
         		.computeResult();
         		
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
-        Object[] minMaxValues = result.get();
+        Map<Variable, Object> resultMinimalRanges = result.get();
         
-    }
+        //assertEquals(solutionMinimalRanges, resultMinimalRanges);
+     }
 }
