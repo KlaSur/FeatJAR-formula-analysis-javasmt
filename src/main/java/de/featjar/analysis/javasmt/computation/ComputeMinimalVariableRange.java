@@ -31,7 +31,9 @@ import de.featjar.base.data.Result;
 import de.featjar.formula.structure.IExpression;
 import de.featjar.formula.structure.term.value.Variable;
 
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -69,8 +71,11 @@ public class ComputeMinimalVariableRange extends AJavaSMTAnalysis<Map<Variable, 
     public Result<Map<Variable, Object>> compute(List<Object> dependencyList, Progress progress) {
         JavaSMTSolver solver = initializeSolver(dependencyList);
         Solvers solverName = solver.getSolverFormula().getSolverName();
-        if (!(solverName.equals(Solvers.Z3))) {
-        	return Result.empty(new UnsupportedOperationException(solverName + " does not support Variable Ranges."));
+        
+        List<Solvers> compatibleSolvers = Arrays.asList(Solvers.Z3);
+        
+        if (!(compatibleSolvers.contains(solverName))) {
+        	return Result.empty(new UnsupportedOperationException(solverName + " does not support ComputeMinimalRanges."));
         }
         
         List<VariableReference> variablesToJavaSMT = solver.getSolverFormula().getTranslator().getMappings();

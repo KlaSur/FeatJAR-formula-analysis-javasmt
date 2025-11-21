@@ -93,7 +93,7 @@ public class JavaSMTSolver {
             final LogManager logManager = BasicLogManager.create(config);
             final ShutdownManager shutdownManager = ShutdownManager.create();
             //context =
-            //        SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
+                    // SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
             //this.formula = new JavaSMTFormula(context, expression);
             this.formula = javaSMTFormula;
             context = formula.getContext();

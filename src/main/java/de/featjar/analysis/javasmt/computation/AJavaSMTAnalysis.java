@@ -24,9 +24,12 @@ import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
 import de.featjar.analysis.javasmt.solver.JavaSMTSolver;
 import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.AComputation;
+import de.featjar.base.computation.Computations;
 import de.featjar.base.computation.Dependency;
 import de.featjar.base.computation.IComputation;
 import de.featjar.formula.structure.IExpression;
+
+import java.time.Duration;
 import java.util.List;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
@@ -41,9 +44,15 @@ import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 public abstract class AJavaSMTAnalysis<T> extends AComputation<T> {
 
     public static final Dependency<JavaSMTFormula> FORMULA = Dependency.newDependency(JavaSMTFormula.class);
+    public static final Dependency<Duration> SAT_TIMEOUT = Dependency.newDependency(Duration.class);
+    public static final Dependency<Long> RANDOM_SEED = Dependency.newDependency(Long.class);
 
     public AJavaSMTAnalysis(IComputation<? extends JavaSMTFormula> formula, Object... computations) {
-        super(formula, computations);
+        super(
+        		formula, 
+        		Computations.of(Duration.ZERO), 
+        		Computations.of(1L), 
+        		computations);
     }
 
     protected AJavaSMTAnalysis(AJavaSMTAnalysis<T> other) {

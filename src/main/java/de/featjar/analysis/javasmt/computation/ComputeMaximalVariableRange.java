@@ -20,6 +20,9 @@
  */
 package de.featjar.analysis.javasmt.computation;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -30,9 +33,12 @@ import org.sosy_lab.java_smt.api.Formula;
 import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
 import de.featjar.analysis.javasmt.solver.JavaSMTSolver;
 import de.featjar.analysis.javasmt.solver.FormulaToJavaSMT.VariableReference;
+import de.featjar.base.computation.Computations;
+import de.featjar.base.computation.Dependency;
 import de.featjar.base.computation.IComputation;
 import de.featjar.base.computation.Progress;
 import de.featjar.base.data.Result;
+import de.featjar.formula.assignment.BooleanAssignment;
 import de.featjar.formula.structure.term.value.Variable;
 
 public class ComputeMaximalVariableRange extends AJavaSMTAnalysis<Map<Variable, Object>> {
@@ -49,8 +55,11 @@ public class ComputeMaximalVariableRange extends AJavaSMTAnalysis<Map<Variable, 
     public Result<Map<Variable, Object>> compute(List<Object> dependencyList, Progress progress) {
         JavaSMTSolver solver = initializeSolver(dependencyList);
         Solvers solverName = solver.getSolverFormula().getSolverName();
-        if (!(solverName.equals(Solvers.Z3))) {
-        	throw new UnsupportedOperationException(solverName + " does not support Variable Ranges.");
+        
+        List<Solvers> compatibleSolvers = Arrays.asList(Solvers.Z3);
+        
+        if (!(compatibleSolvers.contains(solverName))) {
+        	return Result.empty(new UnsupportedOperationException(solverName + " does not support ComputeMaximalRanges."));
         }
         
         List<VariableReference> variablesToJavaSMT = solver.getSolverFormula().getTranslator().getMappings();

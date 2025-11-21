@@ -120,6 +120,18 @@ public class FormulaToJavaSMT {
     public List<VariableReference> getMappings() {
         return new ArrayList<>(variableMap.values());
     }
+    
+    public List<VariableReference> getMappings(List<String> variables) {
+    	List<VariableReference> variableReferences = new ArrayList<VariableReference>();
+    	
+    	for (String variable : variables) {
+    		VariableReference variableReference = variableMap.get(variable);
+    		variableReferences.add(variableReference);
+    	}
+    	
+    	return variableReferences;
+    	
+    }
 
     public BooleanFormula nodeToFormula(IExpression expression) {
         if (expression instanceof Reference) {

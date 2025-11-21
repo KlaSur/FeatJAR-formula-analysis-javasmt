@@ -88,7 +88,7 @@ public class CountSolutionsAnalysisTest extends Common {
         final Result<BigInteger> result =
                 Computations.of(cnf)
                 .map(ComputeJavaSMTFormula::new)
-                .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
+                .set(ComputeJavaSMTFormula.SOLVER, Solvers.PRINCESS)
                 .map(ComputeSolutionCount::new).computeResult();
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
         assertEquals(BigInteger.valueOf(count), result.get());

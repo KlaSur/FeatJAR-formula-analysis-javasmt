@@ -66,31 +66,6 @@ public class ComputeJavaSMTFormula extends AComputation<JavaSMTFormula> {
 	        IFormula vp = (IFormula) FORMULA.get(dependencyList);
 	        Solvers solver = SOLVER.get(dependencyList);
 	        
-//	        Solvers solver = null;
-//	        switch (solverType) {
-//	        	case "MATHSAT5":
-//	        		solver = Solvers.MATHSAT5;
-//	        		break;
-//	        	case "SMTINTERPOL":
-//	        		solver = Solvers.SMTINTERPOL;
-//	        		break;
-//	        	case "Z3":
-//	        		solver = Solvers.Z3;
-//	        		break;
-//	        	case "PRINCESS":
-//	        		solver = Solvers.PRINCESS;
-//	        		break;
-//	        	case "BOOLECTOR":
-//	        		solver = Solvers.BOOLECTOR;
-//	        		break;
-//	        	case "CVC4":
-//	        		solver = Solvers.CVC4;
-//	        		break;
-//	        	case "YICES2":
-//	        		solver = Solvers.YICES2;
-//	        		break;
-//	        }
-	        
 	        VariableMap variableMap = new VariableMap(vp);
 	        
 	        JavaSMTFormula formula = null;

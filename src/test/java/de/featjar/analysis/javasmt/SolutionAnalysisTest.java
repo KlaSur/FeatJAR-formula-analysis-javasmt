@@ -52,6 +52,7 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 public class SolutionAnalysisTest {
 
@@ -83,6 +84,7 @@ public class SolutionAnalysisTest {
         final Result<JavaSMTFormula> javaSMTFormulaResult =
                 Computations.of(cnf)
                 .map(ComputeJavaSMTFormula::new)
+                .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
                 .computeResult();
         assertTrue(javaSMTFormulaResult.isPresent(), () -> Problem.printProblems(javaSMTFormulaResult.getProblems()));
         JavaSMTFormula javaSMTFormula = javaSMTFormulaResult.get();
@@ -90,7 +92,8 @@ public class SolutionAnalysisTest {
         
         // get a satisfying assignment 
         final Result<ValueAssignment> valueAssignmentResult = 
-        		Computations.of(javaSMTFormula).map(ComputeSolution::new).computeResult();
+        		Computations.of(javaSMTFormula).map(ComputeSolution::new)
+        		.computeResult();
         assertTrue(valueAssignmentResult.isPresent(), () -> Problem.printProblems(valueAssignmentResult.getProblems()));
         ValueAssignment valueAssignment = valueAssignmentResult.get();
         

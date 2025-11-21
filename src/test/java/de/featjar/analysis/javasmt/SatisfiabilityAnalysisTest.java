@@ -42,6 +42,7 @@ import java.math.BigInteger;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 public class SatisfiabilityAnalysisTest {
 
@@ -70,6 +71,7 @@ public class SatisfiabilityAnalysisTest {
         IFormula cnf = formula.toCNF().orElseThrow();
         final Result<Boolean> result = Computations.of(cnf)
         		.map(ComputeJavaSMTFormula::new)
+        		.set(ComputeJavaSMTFormula.SOLVER, Solvers.PRINCESS)
         		.map(ComputeSatisfiability::new).computeResult();
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
         assertEquals(true, result.get());
