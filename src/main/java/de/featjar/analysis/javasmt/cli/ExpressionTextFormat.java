@@ -36,7 +36,7 @@ import de.featjar.formula.structure.IExpression;
  * @author Klara Surmeier
  */
 
-public class ExpressionTextFormat<T> implements IFormat<T> {
+public class ExpressionTextFormat implements IFormat<List<IExpression>> {
 
     @Override
     public String getName() {
@@ -54,8 +54,8 @@ public class ExpressionTextFormat<T> implements IFormat<T> {
     }
 
     @Override
-    public Result<String> serialize(T object) {
-        List<IExpression> expressions = (List<IExpression>) object;
+    public Result<String> serialize(List<IExpression> object) {
+        List<IExpression> expressions = object;
     		
         String outputString = "";
     	for (IExpression expression : expressions) {

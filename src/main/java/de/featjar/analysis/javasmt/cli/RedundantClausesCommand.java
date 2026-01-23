@@ -62,7 +62,7 @@ public class RedundantClausesCommand extends AJavasmtAnalysisCommand<List<IExpre
 
     @Override
     protected IFormat<List<IExpression>> getOuputFormat(OptionList optionParser) {
-        return new ExpressionTextFormat<List<IExpression>>();
+        return new ExpressionTextFormat();
     }
 
     @Override

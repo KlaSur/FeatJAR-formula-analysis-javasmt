@@ -87,7 +87,7 @@ public class JavaSMTSolver {
      */
     public SolverContext context;
 
-    public JavaSMTSolver(JavaSMTFormula javaSMTFormula, Solvers solver) {
+    public JavaSMTSolver(JavaSMTFormula javaSMTFormula) {
         try {
             final Configuration config = Configuration.defaultConfiguration();
             final LogManager logManager = BasicLogManager.create(config);

@@ -57,8 +57,8 @@ public class MinimalVariableRangeAnalysisTest {
 
     @Test
     public void formulaHasTwoVariablesWithMinimalRange4And8() {
-        final Variable a = new Variable("a", Long.class);
-        final Variable b = new Variable("b", Long.class);
+        final Variable a = new Variable("a", Double.class);
+        final Variable b = new Variable("b", Double.class);
         final Constant constant3 = new Constant(3L);
         final Constant constant7 = new Constant(7L);
         
@@ -67,8 +67,8 @@ public class MinimalVariableRangeAnalysisTest {
         final And formula = new And(greaterThanA, greaterThanB);
         
         Map<Variable, Object> solutionMinimalRanges = new HashMap<Variable, Object>();
-        solutionMinimalRanges.put(a, Rational.ofString("4"));
-        solutionMinimalRanges.put(b, Rational.ofString("8"));
+        solutionMinimalRanges.put(a, Rational.ofString("3001/1000"));
+        solutionMinimalRanges.put(b, Rational.ofString("7001/1000"));
         
         // IFormula cnf = formula.toCNF().orElseThrow();
         final Result<Map<Variable, Object>> result = Computations.of(formula)

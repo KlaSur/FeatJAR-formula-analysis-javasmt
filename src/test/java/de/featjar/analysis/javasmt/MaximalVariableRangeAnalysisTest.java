@@ -22,12 +22,15 @@
 package de.featjar.analysis.javasmt;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.sosy_lab.common.rationals.Rational;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
@@ -64,9 +67,9 @@ public class MaximalVariableRangeAnalysisTest {
         final LessThan lessThanB = new LessThan(b, constant7);
         final And formula = new And(lessThanA, lessThanB);
         
-        // Map<Variable, Object> solutionMaximalRanges = new HashMap<Variable, Object>();
-        // solutionMaximalRanges.put(a, 2);
-        // solutionMaximalRanges.put(b, 6);
+        Map<Variable, Object> solutionMaximalRanges = new HashMap<Variable, Object>();
+        solutionMaximalRanges.put(a, Rational.ofString("2999/1000"));
+        solutionMaximalRanges.put(b, Rational.ofString("6999/1000"));
         
         // IFormula cnf = formula.toCNF().orElseThrow();
         final Result<Map<Variable, Object>> result = Computations.of(formula)
@@ -78,7 +81,7 @@ public class MaximalVariableRangeAnalysisTest {
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
         Map<Variable, Object> resultMaximalRanges = result.get();
         
-//        assertEquals(solutionMaximalRanges, resultMaximalRanges);
+        assertEquals(solutionMaximalRanges, resultMaximalRanges);
         
     }
 }

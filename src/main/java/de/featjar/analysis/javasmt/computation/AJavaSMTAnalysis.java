@@ -59,7 +59,7 @@ public abstract class AJavaSMTAnalysis<T> extends AComputation<T> {
     }
 
     protected JavaSMTSolver newSolver(JavaSMTFormula formula) {
-        return new JavaSMTSolver(formula, Solvers.SMTINTERPOL);
+        return new JavaSMTSolver(formula);
     }
 
     public JavaSMTSolver initializeSolver(List<Object> dependencyList, boolean empty) {
