@@ -35,12 +35,12 @@ import de.featjar.analysis.javasmt.solver.JavaSMTSolver;
 import de.featjar.base.computation.IComputation;
 import de.featjar.base.computation.Progress;
 import de.featjar.base.data.Result;
-import de.featjar.base.data.SingleLexicographicIterator;
+import de.featjar.base.data.combination.CombinationStream;
+import de.featjar.formula.assignment.ValueAssignment;
 import de.featjar.formula.structure.IExpression;
 import de.featjar.formula.structure.connective.Not;
 import de.featjar.formula.structure.predicate.Equals;
 import de.featjar.formula.structure.term.value.Variable;
-import de.featjar.formula.assignment.ValueAssignment;
 
 /**
  * Finds atomic sets.
@@ -85,9 +85,9 @@ public class ComputeAtomicSet extends AJavaSMTAnalysis<List<List<Variable>>> {
         
         ArrayList<ValueAssignment> solutions = new ArrayList<>();
         
-        SingleLexicographicIterator.stream(index, 2)
+        CombinationStream.stream(index, 2)
         	.forEach(combination -> {
-        		int[] indices = combination.indexElements();
+        		int[] indices = combination.selectionIndices();
         		
 				for (ValueAssignment valueAssignment : solutions) {
 	        		int keyA = index[indices[0]]; 

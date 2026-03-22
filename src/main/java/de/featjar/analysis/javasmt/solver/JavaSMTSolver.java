@@ -25,6 +25,7 @@ import de.featjar.base.data.Result;
 import de.featjar.formula.VariableMap;
 import de.featjar.formula.structure.IExpression;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -60,7 +61,7 @@ import org.sosy_lab.java_smt.api.SolverException;
  */
 public class JavaSMTSolver {
 
-    private static final class SatCallback implements AllSatCallback<Result<BigInteger>> {
+    private static final class CountSatCallback implements AllSatCallback<Result<BigInteger>> {
         BigInteger count = BigInteger.ZERO;
 
         @Override
@@ -73,6 +74,24 @@ public class JavaSMTSolver {
         @Override
         public Result<BigInteger> getResult() throws InterruptedException {
             return Result.of(count);
+        }
+    }
+    
+    private static final class EnumerateSatCallback implements AllSatCallback<Result<List<List<BooleanFormula>>>> {
+        List<List<BooleanFormula>> models = new ArrayList<>();
+
+        @Override
+        public void apply(List<BooleanFormula> model) {
+            if (!model.isEmpty()) {
+            	if (!models.contains(model)) {
+            		models.add(model);
+            	}
+            }
+        }
+
+        @Override
+        public Result<List<List<BooleanFormula>>> getResult() throws InterruptedException {
+            return Result.of(models);
         }
     }
 
@@ -113,12 +132,25 @@ public class JavaSMTSolver {
                     .filter(f -> f instanceof BooleanFormula)
                     .map(f -> (BooleanFormula) f)
                     .collect(Collectors.toList());
-            return prover.allSat(new SatCallback(), booleanVariables);
+            return prover.allSat(new CountSatCallback(), booleanVariables);
         } catch (final Exception e) {
             return Result.empty(e);
         }
     }
-
+    
+    public Result<List<List<BooleanFormula>>> enumerateSolutions() {
+        try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_ALL_SAT)) {
+            prover.addConstraint(this.formula);
+            List<BooleanFormula> booleanVariables = this.javaSMTFormula.getTranslator().getVariableFormulas().stream()
+                    .filter(f -> f instanceof BooleanFormula)
+                    .map(f -> (BooleanFormula) f)
+                    .collect(Collectors.toList());
+            return prover.allSat(new EnumerateSatCallback(), booleanVariables);
+        } catch (final Exception e) {
+            return Result.empty(e);
+        }
+    }
+    
     public de.featjar.formula.assignment.ValueAssignment getSolution() {
         try (ProverEnvironment prover = context.newProverEnvironment(ProverOptions.GENERATE_MODELS)) {
             prover.addConstraint(this.formula);

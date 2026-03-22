@@ -26,6 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import de.featjar.Common;
 import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
 import de.featjar.analysis.javasmt.computation.ComputeSolutionCount;
+import de.featjar.analysis.javasmt.computation.ComputeSolutionEnumeration;
 import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.Computations;
 import de.featjar.base.data.Problem;
@@ -35,13 +36,24 @@ import de.featjar.formula.structure.IFormula;
 import de.featjar.formula.structure.connective.And;
 import de.featjar.formula.structure.connective.BiImplies;
 import de.featjar.formula.structure.connective.Implies;
+import de.featjar.formula.structure.connective.Not;
 import de.featjar.formula.structure.connective.Or;
+import de.featjar.formula.structure.predicate.Equals;
+import de.featjar.formula.structure.predicate.GreaterEqual;
+import de.featjar.formula.structure.predicate.LessThan;
 import de.featjar.formula.structure.predicate.Literal;
+import de.featjar.formula.structure.term.function.integer.IntegerAdd;
+import de.featjar.formula.structure.term.function.integer.IntegerMultiply;
+import de.featjar.formula.structure.term.value.Constant;
+
 import java.math.BigInteger;
+import java.util.List;
+
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 
 public class CountSolutionsAnalysisTest extends Common {
 
@@ -69,7 +81,7 @@ public class CountSolutionsAnalysisTest extends Common {
 
         checkCount(formula, 3);
     }
-
+    
     @Test
     public void gplHas960Solutions() {
         IFormula formula = loadFormula("testFeatureModels/gpl_medium_model.xml");
@@ -88,7 +100,7 @@ public class CountSolutionsAnalysisTest extends Common {
         final Result<BigInteger> result =
                 Computations.of(cnf)
                 .map(ComputeJavaSMTFormula::new)
-                .set(ComputeJavaSMTFormula.SOLVER, Solvers.PRINCESS)
+                .set(ComputeJavaSMTFormula.SOLVER, Solvers.MATHSAT5)
                 .map(ComputeSolutionCount::new).computeResult();
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
         assertEquals(BigInteger.valueOf(count), result.get());

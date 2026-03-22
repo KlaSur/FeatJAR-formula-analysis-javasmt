@@ -18,42 +18,44 @@
  *
  * See <https://github.com/FeatureIDE/FeatJAR-formula-analysis-javasmt> for further information.
  */
+
 package de.featjar.analysis.javasmt.computation;
 
-import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
-import de.featjar.analysis.javasmt.solver.JavaSMTSolver;
-import de.featjar.base.computation.IComputation;
-import de.featjar.base.computation.Progress;
-import de.featjar.base.data.Result;
-import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
 
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 import org.sosy_lab.java_smt.api.BooleanFormula;
 
+import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
+import de.featjar.analysis.javasmt.solver.JavaSMTSolver;
+import de.featjar.base.computation.IComputation;
+import de.featjar.base.computation.Progress;
+import de.featjar.base.data.Result;
+
 /**
- * Counts the number of valid solutions to a formula.
+ * Enumerates valid solutions to a formula.
  *
  * @author Sebastian Krieter
+ * @author Klara Surmeier
  */
-public class ComputeSolutionCount extends AJavaSMTAnalysis<BigInteger> {
+public class ComputeSolutionEnumeration extends AJavaSMTAnalysis<List<List<BooleanFormula>>> {
 
-    public ComputeSolutionCount(IComputation<? extends JavaSMTFormula> formula) {
+    public ComputeSolutionEnumeration(IComputation<? extends JavaSMTFormula> formula) {
         super(formula);
     }
 
     @Override
-    public Result<BigInteger> compute(List<Object> dependencyList, Progress progress) {
+    public Result<List<List<BooleanFormula>>> compute(List<Object> dependencyList, Progress progress) {
         JavaSMTSolver solver = initializeSolver(dependencyList);
     	
    	    List<Solvers> compatibleSolvers = Arrays.asList(Solvers.MATHSAT5, Solvers.SMTINTERPOL);
         
         Solvers solverName = solver.getSolverFormula().getSolverName();
         if (!(compatibleSolvers.contains(solverName))) {
-        	return Result.empty(new UnsupportedOperationException(solverName + " does not support ComputeSolution."));
+        	return Result.empty(new UnsupportedOperationException(solverName + " does not support ComputeSolutionEnumeration."));
         }
         
-        return solver.countSolutions();
+        return solver.enumerateSolutions();
     }
 }

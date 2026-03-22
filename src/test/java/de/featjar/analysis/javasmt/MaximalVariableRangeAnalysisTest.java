@@ -21,8 +21,8 @@
 
 package de.featjar.analysis.javasmt;
 
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -39,6 +39,7 @@ import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.Computations;
 import de.featjar.base.data.Problem;
 import de.featjar.base.data.Result;
+import de.featjar.formula.assignment.ValueAssignment;
 import de.featjar.formula.structure.connective.And;
 import de.featjar.formula.structure.predicate.LessThan;
 import de.featjar.formula.structure.term.value.Constant;

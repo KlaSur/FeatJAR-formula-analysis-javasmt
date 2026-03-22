@@ -38,7 +38,9 @@ import de.featjar.formula.structure.connective.And;
 import de.featjar.formula.structure.connective.BiImplies;
 import de.featjar.formula.structure.connective.Implies;
 import de.featjar.formula.structure.connective.Or;
+import de.featjar.formula.structure.predicate.LessThan;
 import de.featjar.formula.structure.predicate.Literal;
+import de.featjar.formula.structure.term.value.Constant;
 
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
