@@ -38,6 +38,7 @@ import org.sosy_lab.java_smt.api.NumeralFormula.IntegerFormula;
 import org.sosy_lab.java_smt.api.NumeralFormula.RationalFormula;
 import org.sosy_lab.java_smt.api.RationalFormulaManager;
 import org.sosy_lab.java_smt.api.SolverContext;
+import org.sosy_lab.java_smt.api.StringFormula;
 import org.sosy_lab.java_smt.api.StringFormulaManager;
 
 import de.featjar.formula.structure.IExpression;
@@ -60,6 +61,7 @@ import de.featjar.formula.structure.term.function.AAdd;
 import de.featjar.formula.structure.term.function.ADivide;
 import de.featjar.formula.structure.term.function.AMultiply;
 import de.featjar.formula.structure.term.function.IFunction;
+import de.featjar.formula.structure.term.function.string.StringLength;
 import de.featjar.formula.structure.term.value.Constant;
 import de.featjar.formula.structure.term.value.Variable;
 
@@ -77,6 +79,7 @@ public class FormulaToJavaSMT {
     private RationalFormulaManager currentRationalFormulaManager;
     private StringFormulaManager currentStringFormulaManager;
     private boolean isPrincess = false;
+    private boolean isZ3 = false;
     private boolean createVariables = true;
 
     private final Map<String, VariableReference> variableMap = new LinkedHashMap<>();
@@ -113,12 +116,17 @@ public class FormulaToJavaSMT {
         currentFormulaManager = context.getFormulaManager();
         currentBooleanFormulaManager = currentFormulaManager.getBooleanFormulaManager();
         currentIntegerFormulaManager = currentFormulaManager.getIntegerFormulaManager();
-        currentStringFormulaManager = currentFormulaManager.getStringFormulaManager();
         if (context.getSolverName() != Solvers.PRINCESS) { // Princess does not support Rationals
             isPrincess = false;
             currentRationalFormulaManager = currentFormulaManager.getRationalFormulaManager();
         } else {
             isPrincess = true;
+        }
+        if (context.getSolverName() == Solvers.Z3) { // only Z3 supports Strings
+        	isZ3 = true;
+        	currentStringFormulaManager = currentFormulaManager.getStringFormulaManager();
+        } else {
+        	isZ3 = false;
         }
     }
     
@@ -212,6 +220,8 @@ public class FormulaToJavaSMT {
     public BooleanFormula createEqual(final Formula leftTerm, final Formula rightTerm) {
         if (((leftTerm instanceof RationalFormula) || (rightTerm instanceof RationalFormula)) && !isPrincess) {
             return currentRationalFormulaManager.equal((NumeralFormula) leftTerm, (NumeralFormula) rightTerm);
+        } else if (((leftTerm instanceof StringFormula) || (rightTerm instanceof StringFormula)) && isZ3) {
+        	return currentStringFormulaManager.equal((StringFormula) leftTerm, (StringFormula) rightTerm);
         } else {
             return currentIntegerFormulaManager.equal((IntegerFormula) leftTerm, (IntegerFormula) rightTerm);
         }
@@ -286,7 +296,7 @@ public class FormulaToJavaSMT {
         }
     }
 
-    private NumeralFormula handleFunction(IFunction function) {
+    private Formula handleFunction(IFunction function) {
         final Formula[] children = new NumeralFormula[function.getChildrenCount()];
         int index = 0;
         for (final IExpression term : function.getChildren()) {
@@ -314,6 +324,8 @@ public class FormulaToJavaSMT {
                         (IntegerFormula) children[0], (IntegerFormula) children[1]);
             } else if (function instanceof ADivide) {
                 return currentIntegerFormulaManager.divide((IntegerFormula) children[0], (IntegerFormula) children[1]);
+            } else if (function instanceof StringLength && isZ3) {
+            	return currentStringFormulaManager.length((StringFormula) children[0]);
             } else {
                 throw new RuntimeException(
                         "The given function is not supported by JavaSMT Rational Numbers: " + function.getClass());
@@ -331,14 +343,18 @@ public class FormulaToJavaSMT {
                 throw new UnsupportedOperationException("Princess does not support constants from type: Double");
             }
             return currentRationalFormulaManager.makeNumber((double) value);
+        // TODO: include solver name in error message    
         } else if (value instanceof String) {
+        	if (!isZ3) {
+        		throw new UnsupportedOperationException("Constants from type: String are not supported");
+        	}
         	return currentStringFormulaManager.makeString(value.toString());
         } else {
             throw new UnsupportedOperationException("Unknown constant type: " + value.getClass());
         }
     }
 
-    private NumeralFormula handleVariable(Variable variable) {
+    private Formula handleVariable(Variable variable) {
         final Optional<Formula> formula =
                 Optional.ofNullable(variableMap.get(variable.getName())).map(r -> r.javaSmtVariable);
         if (variable.getType() == Double.class) {
@@ -350,7 +366,12 @@ public class FormulaToJavaSMT {
         } else if (variable.getType() == Long.class) {
             return (NumeralFormula) formula.orElseGet(
                     () -> newVariable(variable, currentIntegerFormulaManager::makeVariable).javaSmtVariable);
-        } else {
+        } else if (variable.getType() == String.class) {
+        	return (StringFormula) formula.orElseGet(
+                    () -> newVariable(variable, currentStringFormulaManager::makeVariable).javaSmtVariable);
+        }
+        
+        else {
             throw new UnsupportedOperationException("Unknown variable type: " + variable.getType());
         }
     }

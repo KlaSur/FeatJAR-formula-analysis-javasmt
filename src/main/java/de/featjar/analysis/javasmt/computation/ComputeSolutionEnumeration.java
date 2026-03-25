@@ -49,12 +49,12 @@ public class ComputeSolutionEnumeration extends AJavaSMTAnalysis<List<List<Boole
     public Result<List<List<BooleanFormula>>> compute(List<Object> dependencyList, Progress progress) {
         JavaSMTSolver solver = initializeSolver(dependencyList);
     	
-   	    List<Solvers> compatibleSolvers = Arrays.asList(Solvers.MATHSAT5, Solvers.SMTINTERPOL);
+   	    // List<Solvers> compatibleSolvers = Arrays.asList(Solvers.MATHSAT5, Solvers.SMTINTERPOL);
         
-        Solvers solverName = solver.getSolverFormula().getSolverName();
-        if (!(compatibleSolvers.contains(solverName))) {
-        	return Result.empty(new UnsupportedOperationException(solverName + " does not support ComputeSolutionEnumeration."));
-        }
+        // Solvers solverName = solver.getSolverFormula().getSolverName();
+        // if (!(compatibleSolvers.contains(solverName))) {
+        //	return Result.empty(new UnsupportedOperationException(solverName + " does not support ComputeSolutionEnumeration."));
+        // }
         
         return solver.enumerateSolutions();
     }
