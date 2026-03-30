@@ -64,6 +64,7 @@ import de.featjar.formula.structure.term.function.IFunction;
 import de.featjar.formula.structure.term.function.string.StringLength;
 import de.featjar.formula.structure.term.value.Constant;
 import de.featjar.formula.structure.term.value.Variable;
+import java_cup.internal_error;
 
 /**
  * Class containing functions that are used to translate formulas to java smt.
@@ -297,7 +298,7 @@ public class FormulaToJavaSMT {
     }
 
     private Formula handleFunction(IFunction function) {
-        final Formula[] children = new NumeralFormula[function.getChildrenCount()];
+        final Formula[] children = new Formula[function.getChildrenCount()];
         int index = 0;
         for (final IExpression term : function.getChildren()) {
             children[index++] = termToFormula((ITerm) term);
@@ -387,6 +388,7 @@ public class FormulaToJavaSMT {
 
     private VariableReference newVariable(
             final Variable variable, java.util.function.Function<String, ? extends Formula> variableCreator) {
+    	
         if (createVariables) {
             final Formula newVariable = variableCreator.apply(variable.getName());
             VariableReference variableReference = new VariableReference();
