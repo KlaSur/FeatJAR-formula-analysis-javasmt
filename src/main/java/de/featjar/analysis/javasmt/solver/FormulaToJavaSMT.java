@@ -146,6 +146,10 @@ public class FormulaToJavaSMT {
     	return variableReferences;
     	
     }
+    
+    public FormulaManager getCurrentFormulaManager() {
+    	return currentFormulaManager;
+    }
 
     public BooleanFormula nodeToFormula(IExpression expression) {
         if (expression instanceof Reference) {
