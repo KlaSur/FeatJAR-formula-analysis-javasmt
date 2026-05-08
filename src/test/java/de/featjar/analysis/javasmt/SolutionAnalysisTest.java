@@ -38,10 +38,7 @@ import de.featjar.formula.structure.connective.And;
 import de.featjar.formula.structure.connective.BiImplies;
 import de.featjar.formula.structure.connective.Implies;
 import de.featjar.formula.structure.connective.Or;
-import de.featjar.formula.structure.predicate.LessThan;
 import de.featjar.formula.structure.predicate.Literal;
-import de.featjar.formula.structure.term.value.Constant;
-
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -72,27 +69,26 @@ public class SolutionAnalysisTest {
         final Implies formula = new Implies(or, and);
 
         IFormula cnf = formula.toCNF().orElseThrow();
-        
+
         // retrieve variableMap from first computation using ComputeJavaSMTFormula
-        final Result<JavaSMTFormula> javaSMTFormulaResult =
-                Computations.of(cnf)
+        final Result<JavaSMTFormula> javaSMTFormulaResult = Computations.of(cnf)
                 .map(ComputeJavaSMTFormula::new)
                 .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
                 .computeResult();
         assertTrue(javaSMTFormulaResult.isPresent(), () -> Problem.printProblems(javaSMTFormulaResult.getProblems()));
         JavaSMTFormula javaSMTFormula = javaSMTFormulaResult.get();
         VariableMap variableMap = javaSMTFormula.getVariableMap();
-        
-        // get a satisfying assignment 
-        final Result<ValueAssignment> valueAssignmentResult = 
-        		Computations.of(javaSMTFormula).map(ComputeSolution::new)
-        		.computeResult();
+
+        // get a satisfying assignment
+        final Result<ValueAssignment> valueAssignmentResult =
+                Computations.of(javaSMTFormula).map(ComputeSolution::new).computeResult();
         assertTrue(valueAssignmentResult.isPresent(), () -> Problem.printProblems(valueAssignmentResult.getProblems()));
         ValueAssignment valueAssignment = valueAssignmentResult.get();
-        
+
         // use variableMap for evaluation of formula with the assignment
-        boolean satisfiesFormula = (Boolean) formula.evaluate(valueAssignment, variableMap).orElseThrow();
-        
+        boolean satisfiesFormula =
+                (Boolean) formula.evaluate(valueAssignment, variableMap).orElseThrow();
+
         assertEquals(true, satisfiesFormula);
     }
 }

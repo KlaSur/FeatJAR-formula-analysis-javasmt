@@ -21,30 +21,24 @@
 
 package de.featjar.analysis.javasmt.cli;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-
 import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
 import de.featjar.analysis.javasmt.computation.ComputeMaximalVariableRange;
 import de.featjar.analysis.javasmt.computation.ComputeMinimalVariableRange;
-import de.featjar.analysis.javasmt.computation.ComputeRedundantClauses;
-import de.featjar.analysis.javasmt.computation.ComputeRedundantClausesIncrementally;
 import de.featjar.base.cli.Option;
 import de.featjar.base.cli.OptionList;
 import de.featjar.base.computation.IComputation;
 import de.featjar.base.io.format.IFormat;
 import de.featjar.base.io.text.GenericTextFormat;
-import de.featjar.formula.structure.IExpression;
 import de.featjar.formula.structure.IFormula;
 import de.featjar.formula.structure.term.value.Variable;
+import java.util.Map;
+import java.util.Optional;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 public class VariableRangesCommand extends AJavasmtAnalysisCommand<Map<Variable, Object>> {
-	
-	public static final Option<Boolean> MIN = Option.newFlag("min")
-			.setDescription("Finds the minimal value for each numerical variable in a Term.");
+
+    public static final Option<Boolean> MIN =
+            Option.newFlag("min").setDescription("Finds the minimal value for each numerical variable in a Term.");
 
     @Override
     public Optional<String> getDescription() {
@@ -52,17 +46,18 @@ public class VariableRangesCommand extends AJavasmtAnalysisCommand<Map<Variable,
     }
 
     @Override
-    public IComputation<Map<Variable, Object>> newAnalysis(OptionList optionParser, IComputation<? extends IFormula> formula) {
-    	Boolean min = optionParser.get(MIN);
-    	if (min) {
-    		return formula.map(ComputeJavaSMTFormula::new)
-    				.set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
+    public IComputation<Map<Variable, Object>> newAnalysis(
+            OptionList optionParser, IComputation<? extends IFormula> formula) {
+        Boolean min = optionParser.get(MIN);
+        if (min) {
+            return formula.map(ComputeJavaSMTFormula::new)
+                    .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
                     .map(ComputeMinimalVariableRange::new);
-    	} else {
-    		return formula.map(ComputeJavaSMTFormula::new)
-    				.set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
+        } else {
+            return formula.map(ComputeJavaSMTFormula::new)
+                    .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
                     .map(ComputeMaximalVariableRange::new);
-    	}
+        }
     }
 
     @Override

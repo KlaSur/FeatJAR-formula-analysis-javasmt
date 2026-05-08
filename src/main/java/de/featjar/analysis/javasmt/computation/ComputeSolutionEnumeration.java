@@ -21,17 +21,13 @@
 
 package de.featjar.analysis.javasmt.computation;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.BooleanFormula;
-
 import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
 import de.featjar.analysis.javasmt.solver.JavaSMTSolver;
 import de.featjar.base.computation.IComputation;
 import de.featjar.base.computation.Progress;
 import de.featjar.base.data.Result;
+import java.util.List;
+import org.sosy_lab.java_smt.api.BooleanFormula;
 
 /**
  * Enumerates valid solutions to a formula.
@@ -48,14 +44,15 @@ public class ComputeSolutionEnumeration extends AJavaSMTAnalysis<List<List<Boole
     @Override
     public Result<List<List<BooleanFormula>>> compute(List<Object> dependencyList, Progress progress) {
         JavaSMTSolver solver = initializeSolver(dependencyList);
-    	
-   	    // List<Solvers> compatibleSolvers = Arrays.asList(Solvers.MATHSAT5, Solvers.SMTINTERPOL);
-        
+
+        // List<Solvers> compatibleSolvers = Arrays.asList(Solvers.MATHSAT5, Solvers.SMTINTERPOL);
+
         // Solvers solverName = solver.getSolverFormula().getSolverName();
         // if (!(compatibleSolvers.contains(solverName))) {
-        //	return Result.empty(new UnsupportedOperationException(solverName + " does not support ComputeSolutionEnumeration."));
+        //	return Result.empty(new UnsupportedOperationException(solverName + " does not support
+        // ComputeSolutionEnumeration."));
         // }
-        
+
         return solver.enumerateSolutions();
     }
 }

@@ -24,15 +24,6 @@ package de.featjar.analysis.javasmt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
-import org.sosy_lab.common.rationals.Rational;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-
 import de.featjar.analysis.javasmt.computation.ComputeCore;
 import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
 import de.featjar.analysis.javasmt.computation.VariableNamesList;
@@ -45,6 +36,13 @@ import de.featjar.formula.structure.predicate.GreaterEqual;
 import de.featjar.formula.structure.predicate.LessEqual;
 import de.featjar.formula.structure.term.value.Constant;
 import de.featjar.formula.structure.term.value.Variable;
+import java.util.HashMap;
+import java.util.Map;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
+import org.sosy_lab.common.rationals.Rational;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 public class ComputeCoreTest {
 
@@ -52,7 +50,7 @@ public class ComputeCoreTest {
     public static void begin() {
         FeatJAR.testConfiguration().initialize();
     }
-    
+
     @AfterAll
     public static void end() {
         FeatJAR.deinitialize();
@@ -62,29 +60,28 @@ public class ComputeCoreTest {
     public void formulaHasTwoVariablesWithMaximalRange2And6() {
         final Variable a = new Variable("a", Double.class);
         final Constant constant3 = new Constant(3L);
-        
+
         final GreaterEqual greaterEqualA = new GreaterEqual(a, constant3);
         final LessEqual lessEqualA = new LessEqual(a, constant3);
         final And formula = new And(greaterEqualA, lessEqualA);
-        
+
         Map<Variable, Object> solutionCoreRanges = new HashMap<Variable, Object>();
         solutionCoreRanges.put(a, Rational.ofString("3"));
-        
+
         VariableNamesList variablesOfInterest = new VariableNamesList();
         variablesOfInterest.add("a");
-        
+
         // IFormula cnf = formula.toCNF().orElseThrow();
         final Result<Map<Variable, Object>> result = Computations.of(formula)
-        		.map(ComputeJavaSMTFormula::new)
-        		.set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
-        		.map(ComputeCore::new)
-        		.set(ComputeCore.VARIABLES_OF_INTEREST, variablesOfInterest)
-        		.computeResult();
-        		
+                .map(ComputeJavaSMTFormula::new)
+                .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
+                .map(ComputeCore::new)
+                .set(ComputeCore.VARIABLES_OF_INTEREST, variablesOfInterest)
+                .computeResult();
+
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
         Map<Variable, Object> resultCoreRanges = result.get();
-        
+
         assertEquals(solutionCoreRanges, resultCoreRanges);
-        
     }
 }

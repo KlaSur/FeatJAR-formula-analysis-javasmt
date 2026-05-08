@@ -28,9 +28,7 @@ import de.featjar.base.data.Result;
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.List;
-
 import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.BooleanFormula;
 
 /**
  * Counts the number of valid solutions to a formula.
@@ -46,14 +44,14 @@ public class ComputeSolutionCount extends AJavaSMTAnalysis<BigInteger> {
     @Override
     public Result<BigInteger> compute(List<Object> dependencyList, Progress progress) {
         JavaSMTSolver solver = initializeSolver(dependencyList);
-    	
-   	    List<Solvers> compatibleSolvers = Arrays.asList(Solvers.MATHSAT5, Solvers.SMTINTERPOL);
-        
+
+        List<Solvers> compatibleSolvers = Arrays.asList(Solvers.MATHSAT5, Solvers.SMTINTERPOL);
+
         Solvers solverName = solver.getSolverFormula().getSolverName();
         if (!(compatibleSolvers.contains(solverName))) {
-        	return Result.empty(new UnsupportedOperationException(solverName + " does not support ComputeSolution."));
+            return Result.empty(new UnsupportedOperationException(solverName + " does not support ComputeSolution."));
         }
-        
+
         return solver.countSolutions();
     }
 }

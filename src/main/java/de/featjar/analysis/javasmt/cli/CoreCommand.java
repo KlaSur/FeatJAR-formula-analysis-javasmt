@@ -21,11 +21,6 @@
 
 package de.featjar.analysis.javasmt.cli;
 
-import java.util.Map;
-import java.util.Optional;
-
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-
 import de.featjar.analysis.javasmt.computation.ComputeCore;
 import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
 import de.featjar.base.cli.OptionList;
@@ -34,18 +29,23 @@ import de.featjar.base.io.format.IFormat;
 import de.featjar.base.io.text.GenericTextFormat;
 import de.featjar.formula.structure.IFormula;
 import de.featjar.formula.structure.term.value.Variable;
+import java.util.Map;
+import java.util.Optional;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 public class CoreCommand extends AJavasmtAnalysisCommand<Map<Variable, Object>> {
 
     @Override
     public Optional<String> getDescription() {
-        return Optional.of("Finds numerical core features by checking whether the minimal and maximal range is the same.");
+        return Optional.of(
+                "Finds numerical core features by checking whether the minimal and maximal range is the same.");
     }
 
     @Override
-    public IComputation<Map<Variable, Object>> newAnalysis(OptionList optionParser, IComputation<? extends IFormula> formula) {
-    	return formula.map(ComputeJavaSMTFormula::new)
-				.set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
+    public IComputation<Map<Variable, Object>> newAnalysis(
+            OptionList optionParser, IComputation<? extends IFormula> formula) {
+        return formula.map(ComputeJavaSMTFormula::new)
+                .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
                 .map(ComputeCore::new);
     }
 

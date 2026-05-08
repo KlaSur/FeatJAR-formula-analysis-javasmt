@@ -27,10 +27,8 @@ import de.featjar.base.computation.AComputation;
 import de.featjar.base.computation.Computations;
 import de.featjar.base.computation.Dependency;
 import de.featjar.base.computation.IComputation;
-
 import java.time.Duration;
 import java.util.List;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 /**
  * Base class for analyses using a {@link JavaSMTSolver}.
@@ -47,11 +45,7 @@ public abstract class AJavaSMTAnalysis<T> extends AComputation<T> {
     public static final Dependency<Long> RANDOM_SEED = Dependency.newDependency(Long.class);
 
     public AJavaSMTAnalysis(IComputation<? extends JavaSMTFormula> formula, Object... computations) {
-        super(
-        		formula, 
-        		Computations.of(Duration.ZERO), 
-        		Computations.of(1L), 
-        		computations);
+        super(formula, Computations.of(Duration.ZERO), Computations.of(1L), computations);
     }
 
     protected AJavaSMTAnalysis(AJavaSMTAnalysis<T> other) {

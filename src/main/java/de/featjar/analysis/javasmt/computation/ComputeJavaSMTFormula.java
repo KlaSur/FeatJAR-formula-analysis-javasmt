@@ -20,17 +20,6 @@
  */
 package de.featjar.analysis.javasmt.computation;
 
-import java.util.List;
-
-import org.sosy_lab.common.ShutdownManager;
-import org.sosy_lab.common.configuration.Configuration;
-import org.sosy_lab.common.configuration.InvalidConfigurationException;
-import org.sosy_lab.common.log.BasicLogManager;
-import org.sosy_lab.common.log.LogManager;
-import org.sosy_lab.java_smt.SolverContextFactory;
-import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
-import org.sosy_lab.java_smt.api.SolverContext;
-
 import de.featjar.analysis.javasmt.solver.JavaSMTFormula;
 import de.featjar.base.FeatJAR;
 import de.featjar.base.computation.AComputation;
@@ -41,6 +30,15 @@ import de.featjar.base.computation.Progress;
 import de.featjar.base.data.Result;
 import de.featjar.formula.VariableMap;
 import de.featjar.formula.structure.IFormula;
+import java.util.List;
+import org.sosy_lab.common.ShutdownManager;
+import org.sosy_lab.common.configuration.Configuration;
+import org.sosy_lab.common.configuration.InvalidConfigurationException;
+import org.sosy_lab.common.log.BasicLogManager;
+import org.sosy_lab.common.log.LogManager;
+import org.sosy_lab.java_smt.SolverContextFactory;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
+import org.sosy_lab.java_smt.api.SolverContext;
 
 /**
  * Transforms a formula into a {@link JavaSMTFormula}.
@@ -49,44 +47,41 @@ import de.featjar.formula.structure.IFormula;
  * @author Klara Surmeier
  */
 public class ComputeJavaSMTFormula extends AComputation<JavaSMTFormula> {
-	public static final Dependency<IFormula> FORMULA = Dependency.newDependency(IFormula.class);
-	public static final Dependency<Solvers> SOLVER = Dependency.newDependency(Solvers.class);
+    public static final Dependency<IFormula> FORMULA = Dependency.newDependency(IFormula.class);
+    public static final Dependency<Solvers> SOLVER = Dependency.newDependency(Solvers.class);
 
-	    public ComputeJavaSMTFormula(IComputation<? extends IFormula> formula) {
-	        super(formula, Computations.of(""));
-	    }
+    public ComputeJavaSMTFormula(IComputation<? extends IFormula> formula) {
+        super(formula, Computations.of(""));
+    }
 
-	    protected ComputeJavaSMTFormula(ComputeJavaSMTFormula other) {
-	        super(other);
-	    }
-	    
-	    @Override
-	    public Result<JavaSMTFormula> compute(List<Object> dependencyList, Progress progress) {
-	        IFormula originalFormula = (IFormula) FORMULA.get(dependencyList);
-	        Solvers solver = SOLVER.get(dependencyList);
-	        
-	        VariableMap variableMap = new VariableMap(originalFormula);
-	        
-	        JavaSMTFormula formula = null;
-	        SolverContext context;
-	        
-	        try {
-	            final Configuration config = Configuration.defaultConfiguration();
-	           
-	            final LogManager logManager = BasicLogManager.create(config);
-	            final ShutdownManager shutdownManager = ShutdownManager.create();
-	            context =
-	                    SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
-	           
-	            formula = new JavaSMTFormula(context, originalFormula, variableMap, solver);
-	           
-	      
-	        } catch (final InvalidConfigurationException e) {
-	            FeatJAR.log().error(e);
-	        }
-	        
-	        return Result.of(formula);
-	    }
-	    
-	    
+    protected ComputeJavaSMTFormula(ComputeJavaSMTFormula other) {
+        super(other);
+    }
+
+    @Override
+    public Result<JavaSMTFormula> compute(List<Object> dependencyList, Progress progress) {
+        IFormula originalFormula = (IFormula) FORMULA.get(dependencyList);
+        Solvers solver = SOLVER.get(dependencyList);
+
+        VariableMap variableMap = new VariableMap(originalFormula);
+
+        JavaSMTFormula formula = null;
+        SolverContext context;
+
+        try {
+            final Configuration config = Configuration.defaultConfiguration();
+
+            final LogManager logManager = BasicLogManager.create(config);
+            final ShutdownManager shutdownManager = ShutdownManager.create();
+            context =
+                    SolverContextFactory.createSolverContext(config, logManager, shutdownManager.getNotifier(), solver);
+
+            formula = new JavaSMTFormula(context, originalFormula, variableMap, solver);
+
+        } catch (final InvalidConfigurationException e) {
+            FeatJAR.log().error(e);
+        }
+
+        return Result.of(formula);
+    }
 }

@@ -21,11 +21,10 @@
 
 package de.featjar.analysis.javasmt.cli;
 
-import java.util.List;
-
 import de.featjar.base.data.Result;
 import de.featjar.base.io.format.IFormat;
 import de.featjar.formula.structure.IExpression;
+import java.util.List;
 
 /**
  * Serializes a list of IExpression objects as text, as it is returned by {@link Expression#print()}.
@@ -35,7 +34,6 @@ import de.featjar.formula.structure.IExpression;
  * @author Sebastian Krieter
  * @author Klara Surmeier
  */
-
 public class ExpressionTextFormat implements IFormat<List<IExpression>> {
 
     @Override
@@ -56,15 +54,13 @@ public class ExpressionTextFormat implements IFormat<List<IExpression>> {
     @Override
     public Result<String> serialize(List<IExpression> object) {
         List<IExpression> expressions = object;
-    		
+
         String outputString = "";
-    	for (IExpression expression : expressions) {
-    		String expressionString = expression.print();
-    		outputString += expressionString + "\n";
-    	}
-    	
-    	return Result.of(outputString);
+        for (IExpression expression : expressions) {
+            String expressionString = expression.print();
+            outputString += expressionString + "\n";
+        }
+
+        return Result.of(outputString);
     }
 }
-
-
