@@ -42,6 +42,7 @@ import java.util.Map;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.sosy_lab.java_smt.SolverContextFactory.Solvers;
 
 public class VariableNamesToAssignmentTest {
 
@@ -71,7 +72,9 @@ public class VariableNamesToAssignmentTest {
         // retrieve variableMap from first computation using ComputeJavaSMTFormula
         IFormula cnf = formula.toCNF().orElseThrow();
         final Result<JavaSMTFormula> javaSMTFormulaResult =
-                Computations.of(cnf).map(ComputeJavaSMTFormula::new).computeResult();
+                Computations.of(cnf).map(ComputeJavaSMTFormula::new)
+                .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
+                .computeResult();
         assertTrue(javaSMTFormulaResult.isPresent(), () -> Problem.printProblems(javaSMTFormulaResult.getProblems()));
         JavaSMTFormula javaSMTFormula = javaSMTFormulaResult.get();
         VariableMap variableMap = javaSMTFormula.getVariableMap();

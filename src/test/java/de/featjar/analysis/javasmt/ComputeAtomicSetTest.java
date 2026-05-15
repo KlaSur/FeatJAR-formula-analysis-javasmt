@@ -22,6 +22,7 @@
 package de.featjar.analysis.javasmt;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import de.featjar.analysis.javasmt.computation.ComputeAtomicSet;
 import de.featjar.analysis.javasmt.computation.ComputeJavaSMTFormula;
@@ -30,7 +31,13 @@ import de.featjar.base.computation.Computations;
 import de.featjar.base.data.Problem;
 import de.featjar.base.data.Result;
 import de.featjar.formula.structure.IFormula;
+import de.featjar.formula.structure.predicate.GreaterEqual;
+import de.featjar.formula.structure.predicate.Equals;
+import de.featjar.formula.structure.connective.And;
 import de.featjar.formula.structure.term.value.Variable;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
@@ -51,6 +58,32 @@ public class ComputeAtomicSetTest {
 
     @Test
     public void formulaHasOneAtomicSet() {
+        final Variable a = new Variable("a", Double.class);
+        final Variable b = new Variable("b", Double.class);
+        final Variable c = new Variable("c", Double.class);
+
+        final GreaterEqual greaterEqualAB = new GreaterEqual(a, b);
+        final Equals equalsBC = new Equals(b, c);
+        final And formula = new And(greaterEqualAB, equalsBC);
+
+        List<List<Variable>> expectedSolution = new ArrayList<>();
+        List<Variable> atomicSet = Arrays.asList(b, c);
+        expectedSolution.add(atomicSet);
+
+        final Result<List<List<Variable>>> result = Computations.of(formula)
+                .map(ComputeJavaSMTFormula::new)
+                .set(ComputeJavaSMTFormula.SOLVER, Solvers.Z3)
+                .map(ComputeAtomicSet::new)
+                .computeResult();
+
+        assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
+        List<List<Variable>> solution = result.get();
+
+        assertEquals(expectedSolution, solution);
+    }
+
+    @Test
+    public void testRunningTime() {
         JavaSMTFormulaGenerator formulaGenerator = new JavaSMTFormulaGenerator(42);
         IFormula formula = formulaGenerator.generate(1000, 4000, 3);
         String formulaPrint = formula.printParseable();
@@ -72,9 +105,5 @@ public class ComputeAtomicSetTest {
         System.out.println(diff / 1000.0);
 
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
-        List<List<Variable>> resultAtomicSets = result.get();
-
-        // assertEquals(solutionAtomicSets, resultAtomicSets);
-
     }
 }

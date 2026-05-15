@@ -54,7 +54,7 @@ public class MinimalVariableRangeAnalysisTest {
     }
 
     @Test
-    public void formulaHasTwoVariablesWithMinimalRange4And8() {
+    public void formulaHasTwoVariablesWithMinimalRange3And7() {
         final Variable a = new Variable("a", Double.class);
         final Variable b = new Variable("b", Double.class);
         final Constant constant3 = new Constant(3L);
@@ -78,8 +78,8 @@ public class MinimalVariableRangeAnalysisTest {
         assertTrue(result.isPresent(), () -> Problem.printProblems(result.getProblems()));
         Map<Variable, Object> resultMinimalRanges = result.get();
 
-        System.out.println(resultMinimalRanges);
-
         assertEquals(solutionMinimalRanges, resultMinimalRanges);
     }
 }
+
+

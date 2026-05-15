@@ -76,7 +76,7 @@ public class ComputeSolutionEnumerationTest {
     }
 
     @Test
-    public void testEnumerateSolutionsWithMinimalSaladFeatureModel() {
+    public void formulaHasEightSatisfyingAssignments() {
         IFormula expectedFormula = new Reference(new And(
                 new And(new And(
                         new Literal("Veggies"),

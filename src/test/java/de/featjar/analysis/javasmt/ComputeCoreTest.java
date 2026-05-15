@@ -57,7 +57,7 @@ public class ComputeCoreTest {
     }
 
     @Test
-    public void formulaHasTwoVariablesWithMaximalRange2And6() {
+    public void formulaHasOneCoreVariable() {
         final Variable a = new Variable("a", Double.class);
         final Constant constant3 = new Constant(3L);
 
