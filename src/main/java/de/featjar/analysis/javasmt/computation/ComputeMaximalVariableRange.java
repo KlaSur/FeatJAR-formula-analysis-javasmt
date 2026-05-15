@@ -77,7 +77,7 @@ public class ComputeMaximalVariableRange extends AJavaSMTAnalysis<Map<Variable, 
         Map<Variable, Object> variabelsToMaximalRanges = new HashMap<Variable, Object>();
         for (VariableReference variableToJavaSMT : variablesToJavaSMT) {
             Formula variableToMaximize = variableToJavaSMT.getJavaSmtVariable();
-            Object maximalRange = solver.maximize(variableToJavaSMT.getJavaSmtVariable());
+            Object maximalRange = solver.maximize(variableToMaximize);
             variabelsToMaximalRanges.put(variableToJavaSMT.getVariable(), maximalRange);
         }
 

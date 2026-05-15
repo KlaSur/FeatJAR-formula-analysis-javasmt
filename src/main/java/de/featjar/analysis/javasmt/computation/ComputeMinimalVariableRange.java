@@ -77,7 +77,7 @@ public class ComputeMinimalVariableRange extends AJavaSMTAnalysis<Map<Variable, 
         Map<Variable, Object> variabelsToMinimalRanges = new HashMap<Variable, Object>();
         for (VariableReference variableToJavaSMT : variablesToJavaSMT) {
             Formula variableToMinimize = variableToJavaSMT.getJavaSmtVariable();
-            Object minimalRange = solver.minimize(variableToJavaSMT.getJavaSmtVariable());
+            Object minimalRange = solver.minimize(variableToMinimize);
             variabelsToMinimalRanges.put(variableToJavaSMT.getVariable(), minimalRange);
         }
 
